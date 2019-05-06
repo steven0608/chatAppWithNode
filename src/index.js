@@ -16,13 +16,21 @@ const port = process.env.PORT || 3000
 
 const publicDirectoryPath = path.join(__dirname, '../public');
 
+let count = 0
 
 // serve up the public directory
 app.use(express.static(publicDirectoryPath));
 
-io.on('connection', ()=>{
+io.on('connection', (socket)=>{
   console.log('New web socket connection');
-})
+
+  socket.emit('countUpdated', count);
+  
+  socket.on('increment', ()=>{
+    count++;
+    io.emit('countUpdated', count);
+  })
+});
 // listen on port 3000
 server.listen(port, ()=>{
   console.log(`Server is up on port ${port}!`);
